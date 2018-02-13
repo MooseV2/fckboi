@@ -1,0 +1,279 @@
+-- Written in one crazy night by Anthony DeSouza
+------------------------------------------------
+
+-- Since Boilang types are big ints,
+-- we can sorta get away with using them as memory cells.
+-- It's awkward, but it kinda works.
+boi: pointer [int 0] boi
+boi: data_len [int 0] boi
+boi: data [int 0] boi
+boi: brackets [int 0] boi
+boi: command_pointer [int 0] boi
+boi: PROGRAM [int 0] boi
+boi: PROGRAM_LEN [int 0] boi
+
+oh debug boi
+	-- comment out in production (lol)
+	-- could be a conditional but I'm lazy
+	-- boi, "DEBUG: " boi:arg.0 boi
+BOI
+
+
+oh yea boi
+	boi: exit true boi
+BOI
+
+oh eq boi
+	boi: exit true boi
+	boi? < boi:arg.0 boi:arg.1 boi
+		boi: exit false boi
+	BOI
+	boi? < boi:arg.1 boi:arg.0 boi
+		boi: exit false boi
+	BOI
+BOI
+
+oh pow boi
+	-- Calculate x^y
+	ONE poweh boi
+	ONE startpoweh boi
+	ONE ayy boi
+	ONE alsoayy boi
+	boi: ayy boi:arg.1 boi
+	boi: startpoweh boi:arg.0 boi
+	boi: poweh boi:startpoweh boi
+
+	-- case if x^0
+	boi? < boi:ayy [int 1] boi
+		boi: poweh [int 1] boi
+	BOI
+
+	bloop < [int 1] boi:ayy boi
+		boi: ayy [- boi:ayy [int 1]] boi
+		boi: poweh [* boi:poweh boi:startpoweh] boi
+	BOI
+	boi: exit boi:poweh boi
+
+BOI
+
+oh sub boi
+	-- better subtract that doesn't screw you over
+	boi: exit [int 0] boi
+	-- only subtract if result > 0
+	boi? < boi:arg.1 boi:arg.0 boi
+		boi: exit [- boi:arg.0 boi:arg.1] boi
+	BOI
+BOI
+
+oh end_of_data boi
+	boi? < boi:data_len boi:pointer boi
+	-- add more data
+		boi: data_len [+ boi:data_len [int 3]] boi
+		boi: data [* boi:data [int 1000]] boi
+		boi! debug "Added more data" boi
+	BOI
+BOI
+
+oh setp boi
+	ONE mutli boi
+	ONE arg0 boi
+
+	boi: arg0 boi:arg.0 boi
+	boi: multi [pow [int 10] [sub boi:data_len boi:pointer]] boi
+	-- boi! debug [nyan "Multiply: " [dec boi:multi]] boi
+	-- Clear old data
+	-- (hold on to your pants, this is a mindfck)
+	ONE olddata1 boi
+	ONE olddata2 boi
+	boi: olddata1 [/ boi:data boi:multi] boi
+	boi: olddata2 [* [/ boi:olddata1 [int 1000]] [int 1000]] boi
+	boi: olddata1 [- boi:olddata1 boi:olddata2] boi
+	boi: data [- boi:data [* boi:multi boi:olddata1]] boi
+	-- Set new data
+	boi: data [+ boi:data [* boi:multi boi:arg0]] boi
+BOI
+
+oh getp boi
+	ONE mutli boi
+	ONE arg0 boi
+	
+	boi: arg0 boi:arg.0 boi
+	boi: multi [pow [int 10] [sub boi:data_len boi:pointer]] boi
+	-- boi! debug [nyan "Multiply: " [dec boi:multi]] boi
+	-- Clear old data
+	-- (hold on to your pants, this is a mindfck)
+	ONE olddata1 boi
+	ONE olddata2 boi
+	boi: olddata1 [/ boi:data boi:multi] boi
+	boi: olddata2 [* [/ boi:olddata1 [int 1000]] [int 1000]] boi
+	boi: exit [- boi:olddata1 boi:olddata2] boi
+	-- Set new data
+BOI
+
+oh getc boi
+	-- get command at position arg.0
+	ONE truncated boi
+	ONE actual boi
+	boi: truncated [/ boi:PROGRAM [pow [int 10] [sub boi:arg.0 [int 1]]]] boi
+	boi: actual [* [/ boi:truncated [int 10]] [int 10]] boi
+	boi: exit [- boi:truncated boi:actual] boi
+	-- boi, "A0: " [dec boi:arg.0] boi
+	-- boi, "Program: " [dec boi:PROGRAM] boi
+	-- boi, "Truncat: " [dec boi:truncated] boi
+	-- boi, "Actual : " [dec boi:actual] boi
+	-- boi, "Actual new: " [dec [- boi:truncated boi:actual]] boi
+BOI
+
+oh addcode boi
+	ONE arg0 boi
+	ONE arg1 boi
+	boi: arg0 boi:arg.0 boi
+	boi: arg1 boi:arg.1 boi
+	boi: PROGRAM [+ boi:PROGRAM [* boi:arg0 [pow [int 10] boi:PROGRAM_LEN]]] boi
+	boi: PROGRAM_LEN [+ boi:arg1 boi:PROGRAM_LEN] boi
+BOI
+
+-- ---------------------
+-- START OF BRAINFUCK COMMANDS
+-- ---------------------
+-- Command '>' [1]
+-- Move the pointer to the right
+oh mv_r boi
+	boi! debug "Moved right" boi
+	boi: pointer [+ boi:pointer [int 3]] boi
+	boi! end_of_data boi
+BOI
+
+-- Command '<' [2]
+-- Move the pointer to the left
+oh mv_l boi
+	boi! debug "Moved left" boi
+	boi: pointer [- boi:pointer [int 3]] boi
+BOI
+
+-- Command '+' [3]
+-- Increment the memory cell under the pointer
+oh incp boi
+	boi! setp [+ [getp] [int 1]] boi
+BOI
+
+-- Command '-' [4]
+-- Decrement the memory cell under the pointer
+oh decp boi
+	boi! setp [sub [getp] [int 1]] boi
+BOI
+
+-- Command '.' [5]
+-- Output the character signified by the cell at the pointer
+oh printp boi
+	boi, [getp] boi
+	-- boi! fuckdatnewline boi
+BOI
+
+-- Command ',' [6]
+-- Input a character and store it in the cell at the pointer
+-- No replacement, boilang doesn't support stdin
+-- Might think of a workaround
+
+-- Command '[' [7]
+-- Jump past the matching ] if the cell under the pointer is 0
+oh startbrace boi
+	boi: brackets [int 1]
+	bloop < [int 0] boi:brackets boi
+		boi: command_pointer [+ boi:command_pointer [int 1]] boi
+		boi? eq [getc boi:command_pointer] [int 7] boi -- '['
+			boi: brackets [+ boi:brackets [int 1]] boi
+		BOI
+		boi? eq [getc boi:command_pointer] [int 8] boi -- '['
+			boi: brackets [- boi:brackets [int 1]] boi
+		BOI
+	BOI
+	boi: command_pointer [+ boi:command_pointer [int 1]] boi
+BOI
+-- Command ']' [8]
+-- Jump back to the matching [ if the cell under the pointer is nonzero
+oh endbrace boi
+	boi: brackets [int 1] boi
+	bloop < [int 0] boi:brackets boi
+		-- boi, [dec boi:brackets] "/" [dec boi:command_pointer] boi
+		boi: command_pointer [- boi:command_pointer [int 1]] boi
+		boi? eq [getc boi:command_pointer] [int 7] boi -- '['
+			boi: brackets [- boi:brackets [int 1]] boi
+		BOI
+		boi? eq [getc boi:command_pointer] [int 8] boi -- '['
+			boi: brackets [+ boi:brackets [int 1]] boi
+		BOI
+	BOI
+BOI
+
+oh fuckdatnewline boi
+	-- terminal escape to move cursor up
+	boi, [int 27] [int 91] [int 49] [int 65] boi
+BOI
+
+
+oh parse boi
+	ONE c boi
+	boi: c boi:arg.0 boi
+	boi? eq boi:c [int 1] boi -- >
+		boi! debug "P: Move right" boi
+		boi! mv_r boi
+	BOI
+	boi? eq boi:c [int 2] boi -- <
+		boi! debug "P: Move left" boi
+		boi! mv_l boi
+	BOI
+	boi? eq boi:c [int 3] boi -- +
+		boi! debug "P: Increment" boi
+		boi! incp boi
+	BOI
+	boi? eq boi:c [int 4] boi -- -
+		boi! debug "P: Decrement" boi
+		boi! decp boi
+	BOI
+	boi? eq boi:c [int 5] boi -- .
+		boi! debug "P: Print" boi
+		boi! printp boi
+	BOI
+	boi? eq boi:c [int 6] boi -- ,
+		boi! debug "P: Input" boi
+		boi, "Input doesn't work boi" boi
+	BOI
+	boi? eq boi:c [int 7] boi -- [
+		boi! debug "P: Startbrace" boi
+		boi? eq [getp] [int 0] boi
+			boi! startbrace boi
+		BOI
+	BOI
+	boi? eq boi:c [int 8] boi -- ]
+		boi! debug "P: Endbrace" boi
+		boi? < [int 0] [getp] boi
+			boi! endbrace boi
+		BOI
+	BOI
+BOI
+
+oh start boi
+	boi: PROGRAM_LEN [+ boi:PROGRAM_LEN [int 1]] boi
+	bloop < boi:command_pointer boi:PROGRAM_LEN boi
+		boi! parse [getc boi:command_pointer] boi
+		boi: command_pointer [+ boi:command_pointer [int 1]] boi
+	BOI
+BOI
+
+-- START OF PROGRAM --
+boi! addcode [int 1733333333] [int 10] boi
+boi! addcode [int 3133173333] [int 10] boi
+boi! addcode [int 2231333133] [int 10] boi
+boi! addcode [int 4131318422] [int 10] boi
+boi! addcode [int 1842827311] [int 10] boi
+boi! addcode [int 3335444151] [int 10] boi
+boi! addcode [int 5333553333] [int 10] boi
+boi! addcode [int 3352542511] [int 10] boi
+boi! addcode [int 4544444453] [int 10] boi
+boi! addcode [int 1154444444] [int 10] boi
+boi! addcode [int 533153] [int 6] boi
+-- END OF PROGRAM --
+
+-- boi! start boi
+boi! start boi
