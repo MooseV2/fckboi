@@ -39,6 +39,7 @@ For example, the numbers `123`, `555`, and `789` would be stored as a single num
 - Boi-lang numbers are unsigned. Only use positive numbers please.
 - Boi-lang places an annoying newline after every print. Learn to read words vertically.
 - Boi-lang uses bigints internally but you can only assign varibles with 64 bit ints. That's why the code is split over many lines when you convert it.
+- It's extremely slow. Use with care.
 
 ## r u ok
 
